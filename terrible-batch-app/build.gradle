@@ -1,0 +1,16 @@
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    compile project(':terrible-batch-data')
+    compile project(':terrible-batch-cleaner')
+    compile project(':terrible-batch-directory')
+    compile project(':terrible-batch-thumbnails')
+}

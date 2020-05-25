@@ -1,1 +1,8 @@
 rootProject.name = 'terrible-batch'
+
+include 'terrible-batch-app'
+include 'terrible-batch-data'
+include 'terrible-batch-cleaner'
+include 'terrible-batch-directory'
+include 'terrible-batch-thumbnails'
+

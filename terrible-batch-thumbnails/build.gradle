@@ -1,0 +1,16 @@
+group = 'io.terrible.batch.thumbnails'
+version = '0.0.1-SNAPSHOT'
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    compile project(':terrible-batch-data')
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+}
