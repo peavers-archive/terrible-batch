@@ -2,13 +2,10 @@
 package io.terrible.batch.jobs;
 
 import io.terrible.batch.domain.MediaFile;
-import io.terrible.batch.processors.DirectoryProcessor;
+import io.terrible.batch.processors.CleanProcessor;
 import io.terrible.batch.repository.MediaFileRepository;
-import io.terrible.batch.services.ScanService;
-import io.terrible.batch.tasklet.SearchIndexTasklet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -18,20 +15,21 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
-import org.springframework.batch.item.support.IteratorItemReader;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class DirectoryScanBatch {
+public class CleanBatch {
 
   private final JobBuilderFactory jobBuilderFactory;
 
@@ -39,29 +37,36 @@ public class DirectoryScanBatch {
 
   private final MongoTemplate mongoTemplate;
 
-  private final ScanService scanService;
-
   private final MediaFileRepository mediaFileRepository;
 
   @StepScope
-  @Bean(name = "directoryScanReader")
-  public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
+  @Bean(name = "cleanReader")
+  public ItemReader<MediaFile> reader() {
 
-    try {
-      return new IteratorItemReader<>(scanService.scanVideos(dir));
-    } catch (IOException e) {
-      throw new RuntimeException("Stop everything. Unable to read from directory");
-    }
+    final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
+
+    final Map<String, Sort.Direction> map = new HashMap<>();
+    map.put("_id", Sort.Direction.DESC);
+
+    reader.setTemplate(mongoTemplate);
+    reader.setSort(map);
+    reader.setTargetType(MediaFile.class);
+    reader.setQuery("{}");
+    reader.setSaveState(false);
+
+    return reader;
   }
 
-  @Bean(name = "directoryScanProcessor")
-  public DirectoryProcessor processor() {
+  @Bean(name = "cleanProcessor")
+  public CleanProcessor processor() {
 
-    return new DirectoryProcessor(mediaFileRepository);
+    return new CleanProcessor(mediaFileRepository);
   }
 
-  @Bean(name = "directoryScanWriter")
+  @Bean(name = "cleanWriter")
   public ItemWriter<MediaFile> writer() {
+
+    log.info("Writing for cleaner");
 
     final MongoItemWriter<MediaFile> writer = new MongoItemWriter<>();
     writer.setCollection("media-files");
@@ -70,32 +75,25 @@ public class DirectoryScanBatch {
     return writer;
   }
 
-  @Bean(name = "directoryScannerStep")
-  public Step directoryScannerStep() {
+  @Bean(name = "cleanStep")
+  public Step cleanStep() {
 
     return stepBuilderFactory
-        .get("directoryScannerStep")
+        .get("cleanStep")
         .<MediaFile, MediaFile>chunk(1)
-        .reader(reader(StringUtils.EMPTY))
-        .processor(processor())
+        .reader(reader())
         .writer(writer())
+        .processor(processor())
         .build();
   }
 
-  @Bean(name = "searchIndexStep")
-  public Step searchIndexStep() {
-
-    return stepBuilderFactory.get("searchIndexStep").tasklet(new SearchIndexTasklet()).build();
-  }
-
-  @Bean(name = "directoryScannerJob")
+  @Bean(name = "cleanJob")
   public Job directoryScannerJob() {
 
     return jobBuilderFactory
-        .get("directoryScannerJob")
+        .get("cleanJob")
         .incrementer(new RunIdIncrementer())
-        .start(directoryScannerStep())
-        .next(searchIndexStep())
+        .start(cleanStep())
         .build();
   }
 }
