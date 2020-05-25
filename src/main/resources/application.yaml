@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: terrible-batch-service
+
+server:
+  port: 8090
+
+batch:
+  delay: 60000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
