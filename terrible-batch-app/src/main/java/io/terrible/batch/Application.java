@@ -9,9 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @Slf4j
 @ConfigurationPropertiesScan
 @SpringBootApplication(scanBasePackages = "io.terrible.*")
-public class BatchApplication {
+public class Application {
 
   public static void main(String[] args) {
-    SpringApplication.run(BatchApplication.class, args);
+    SpringApplication.run(Application.class, args);
   }
 }

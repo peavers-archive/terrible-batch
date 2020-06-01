@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.thumbnails.jobs;
 
-
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
@@ -21,6 +20,8 @@ import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -93,10 +94,11 @@ public class ThumbnailGeneratorBatch {
 
     return stepBuilderFactory
         .get("thumbnailGeneratorStep")
-        .<MediaFile, MediaFile>chunk(3)
+        .<MediaFile, MediaFile>chunk(6)
         .reader(reader())
         .processor(processor())
         .writer(writer())
+        .taskExecutor(taskExecutor())
         .build();
   }
 
@@ -107,7 +109,12 @@ public class ThumbnailGeneratorBatch {
         .get("partitionedStep")
         .partitioner(thumbnailGeneratorStep)
         .partitioner("thumbnailGeneratorStep", new SimplePartitioner())
-        .gridSize(3)
+        .gridSize(6)
         .build();
+  }
+
+  @Bean
+  public TaskExecutor taskExecutor() {
+    return new SimpleAsyncTaskExecutor("thumbnail_task");
   }
 }
