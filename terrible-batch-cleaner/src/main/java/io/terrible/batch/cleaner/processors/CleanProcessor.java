@@ -1,13 +1,12 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.cleaner.processors;
 
+import io.terrible.batch.data.domain.MediaFile;
+import io.terrible.batch.data.repository.MediaFileRepository;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Paths;
-
-import io.terrible.batch.data.domain.MediaFile;
-import io.terrible.batch.data.repository.MediaFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;

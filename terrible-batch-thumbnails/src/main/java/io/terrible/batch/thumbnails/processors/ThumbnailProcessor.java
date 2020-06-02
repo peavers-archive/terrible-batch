@@ -4,11 +4,10 @@ package io.terrible.batch.thumbnails.processors;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
 import io.terrible.batch.thumbnails.utils.FileUtils;
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
-
-import java.nio.file.Path;
 
 @Slf4j
 @RequiredArgsConstructor
