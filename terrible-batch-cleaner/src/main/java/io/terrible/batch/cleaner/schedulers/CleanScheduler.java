@@ -25,7 +25,7 @@ public class CleanScheduler {
   @Qualifier("cleanJob")
   private final Job cleanJob;
 
-  @Scheduled(fixedDelayString = "${batch.delay}")
+  @Scheduled(fixedDelayString = "${batch.cleaner.delay}")
   public void schedule() {
 
     execute();

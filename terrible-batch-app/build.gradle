@@ -19,7 +19,21 @@ dependencies {
 }
 
 jib {
+    from {
+        image = 'peavers/terrible-base-ffmpeg-java:latest'
+    }
     to {
         image = 'peavers/terrible-batch'
+        auth {
+            username = System.getenv("DOCKER_USER")
+            password = System.getenv("DOCKER_PASS")
+        }
+        tags = ["latest", "${project.name}-${project.version}".toString()]
+    }
+    container {
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        jvmFlags = ['-Dspring.profiles.active=production', '-XX:+UseContainerSupport', '-Dfile.encoding=UTF-8']
+        labels = [maintainer: 'Chris <peavers@gmail.com>']
+        user = "nobody:nogroup"
     }
 }

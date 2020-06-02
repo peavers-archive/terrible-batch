@@ -12,19 +12,11 @@ import java.nio.file.Files;
 @UtilityClass
 public class FileUtils {
 
-  /** System key value for home directory. */
-  private final String USER_HOME_PROPERTY = "user.home";
-
-  /**
-   * Location on the filesystem relative to the home directory to store thumbnails, if not provided
-   * when setting the directory.
-   */
-  private final String THUMBNAIL_DIRECTORY = ".terrible/_thumbnails/";
+  private final String BASE_DIR = "/terrible/terrible-thumbnails/";
 
   public String getThumbnailDirectory(final MediaFile mediaFile) {
 
-    final File file =
-        new File(System.getProperty(USER_HOME_PROPERTY), THUMBNAIL_DIRECTORY + mediaFile.getId());
+    final File file = new File(BASE_DIR + mediaFile.getId());
 
     return createDirectory(file);
   }

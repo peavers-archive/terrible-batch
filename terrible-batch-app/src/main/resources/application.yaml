@@ -2,11 +2,13 @@ spring:
   application:
     name: terrible-batch-service
 
-server:
-  port: 8090
-
 batch:
-  delay: 60000
+  directory:
+    delay: 60000
+  cleaner:
+    delay: 70000
+  thumbnails:
+    delay: 80000
 
 ---
 spring:
