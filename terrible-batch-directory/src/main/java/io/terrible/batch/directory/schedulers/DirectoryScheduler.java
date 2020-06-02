@@ -5,11 +5,13 @@ import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.repository.DirectoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectoryScheduler {
 
-  private static final String DEFAULT_DIRECTORY = "/terrible/terrible-media";
+  @Value("${batch.directory.default}")
+  private String defaultDirectory;
 
   private final DirectoryRepository directoryRepository;
 
@@ -37,7 +40,11 @@ public class DirectoryScheduler {
 
     final Directory directory = getDirectory();
 
-    execute(directory);
+    if (StringUtils.isEmpty(directory.getPath())) {
+      log.warn("No directory found, skipping job");
+    } else {
+      execute(directory);
+    }
   }
 
   private void execute(Directory directory) {
@@ -59,7 +66,7 @@ public class DirectoryScheduler {
     final List<Directory> directories = directoryRepository.findAll();
 
     return directories.isEmpty()
-        ? directoryRepository.save(Directory.builder().path(DEFAULT_DIRECTORY).build())
+        ? directoryRepository.save(Directory.builder().path(defaultDirectory).build())
         : directories.get(0);
   }
 }

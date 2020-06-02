@@ -4,10 +4,12 @@ spring:
 
 batch:
   directory:
+    default: ""
     delay: 60000
   cleaner:
     delay: 70000
   thumbnails:
+    default: "/home/chris/.terrible/thumbnails/"
     delay: 80000
 
 ---
@@ -16,3 +18,9 @@ spring:
   data:
     mongodb:
       host: terrible-mongo
+
+batch:
+  directory:
+    default: "/terrible/terrible-media/"
+  thumbnails:
+    default: "/terrible/terrible-thumbnails/"

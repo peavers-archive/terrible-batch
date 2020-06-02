@@ -12,11 +12,9 @@ import java.nio.file.Files;
 @UtilityClass
 public class FileUtils {
 
-  private final String BASE_DIR = "/terrible/terrible-thumbnails/";
+  public String getThumbnailDirectory(final String baseDir, final MediaFile mediaFile) {
 
-  public String getThumbnailDirectory(final MediaFile mediaFile) {
-
-    final File file = new File(BASE_DIR + mediaFile.getId());
+    final File file = new File(baseDir + mediaFile.getId());
 
     return createDirectory(file);
   }

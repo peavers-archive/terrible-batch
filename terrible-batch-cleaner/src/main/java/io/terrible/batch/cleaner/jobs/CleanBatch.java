@@ -2,11 +2,10 @@
 package io.terrible.batch.cleaner.jobs;
 
 import io.terrible.batch.cleaner.processors.CleanProcessor;
-import java.util.HashMap;
-import java.util.Map;
-
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.MediaFileRepository;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

@@ -1,9 +1,8 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.thumbnails.utils;
 
-import lombok.experimental.UtilityClass;
-
 import java.util.ArrayList;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class CommandUtils {
