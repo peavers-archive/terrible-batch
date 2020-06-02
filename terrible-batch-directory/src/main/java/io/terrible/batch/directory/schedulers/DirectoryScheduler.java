@@ -3,7 +3,6 @@ package io.terrible.batch.directory.schedulers;
 
 import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.repository.DirectoryRepository;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -15,11 +14,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
-public class DirectoryScanScheduler {
+public class DirectoryScheduler {
+
+  private static final String DEFAULT_DIRECTORY = "/terrible/terrible-media";
 
   private final DirectoryRepository directoryRepository;
 
@@ -28,14 +32,12 @@ public class DirectoryScanScheduler {
   @Qualifier("directoryScannerJob")
   private final Job directoryScannerJob;
 
-  @Scheduled(fixedDelayString = "${batch.delay}")
+  @Scheduled(fixedDelayString = "${batch.directory.delay}")
   public void schedule() {
 
-    final Directory directory = directoryRepository.findAll().get(0);
+    final Directory directory = getDirectory();
 
-    if (directory != null) {
-      execute(directory);
-    }
+    execute(directory);
   }
 
   private void execute(Directory directory) {
@@ -51,5 +53,13 @@ public class DirectoryScanScheduler {
     } catch (Exception e) {
       log.error("Unable to run {} {} {}", directoryScannerJob.getName(), e.getMessage(), e);
     }
+  }
+
+  private Directory getDirectory() {
+    final List<Directory> directories = directoryRepository.findAll();
+
+    return directories.isEmpty()
+        ? directoryRepository.save(Directory.builder().path(DEFAULT_DIRECTORY).build())
+        : directories.get(0);
   }
 }

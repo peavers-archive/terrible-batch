@@ -28,7 +28,7 @@ public class ThumbnailGeneratorScheduler {
   @Qualifier("thumbnailGeneratorJob")
   private final Job thumbnailGeneratorJob;
 
-  @Scheduled(fixedDelayString = "${batch.delay}")
+  @Scheduled(fixedDelayString = "${batch.thumbnails.delay}")
   public void schedule()
       throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
           JobRestartException, JobInstanceAlreadyCompleteException {

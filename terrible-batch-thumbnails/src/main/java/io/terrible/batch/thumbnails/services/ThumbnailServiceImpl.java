@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 
@@ -28,6 +29,8 @@ public class ThumbnailServiceImpl implements ThumbnailService {
    */
   @Override
   public ArrayDeque<String> createThumbnails(final Path input, final Path output, final int count) {
+
+    if (!Files.isReadable(input)) return new ArrayDeque<>(0);
 
     double duration = calculateDuration(input);
 

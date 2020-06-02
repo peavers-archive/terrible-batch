@@ -6,7 +6,6 @@ import io.terrible.batch.data.repository.MediaFileRepository;
 import io.terrible.batch.directory.processors.DirectoryProcessor;
 import io.terrible.batch.directory.services.ScanService;
 import io.terrible.batch.directory.tasklet.SearchIndexTasklet;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +29,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class DirectoryScanBatch {
+public class DirectoryBatch {
 
   private final JobBuilderFactory jobBuilderFactory;
 
@@ -46,11 +45,7 @@ public class DirectoryScanBatch {
   @Bean(name = "directoryScanReader")
   public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
 
-    try {
-      return new IteratorItemReader<>(scanService.scanVideos(dir));
-    } catch (IOException e) {
-      throw new RuntimeException("Stop everything. Unable to read from directory");
-    }
+    return new IteratorItemReader<>(scanService.scanVideos(dir));
   }
 
   @Bean(name = "directoryScanProcessor")

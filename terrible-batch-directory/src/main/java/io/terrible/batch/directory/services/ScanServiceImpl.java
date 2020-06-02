@@ -4,17 +4,15 @@ package io.terrible.batch.directory.services;
 import com.google.common.net.MediaType;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.directory.converters.MediaFileConverter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayDeque;
-import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
 
 @Slf4j
 @Service
@@ -22,50 +20,38 @@ import org.springframework.stereotype.Service;
 public class ScanServiceImpl implements ScanService {
 
   @Override
-  public ArrayDeque<MediaFile> scanVideos(final String input) throws IOException {
+  public ArrayDeque<MediaFile> scanVideos(final String input) {
 
-    if (input == null) {
-      return new ArrayDeque<>(0);
+    final ArrayDeque<MediaFile> results = new ArrayDeque<>();
+
+    if (StringUtils.isEmpty(input)) {
+      return results;
     }
 
-    final Collection<File> files =
-        FileUtils.listFiles(new File(input), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-
-    final ArrayDeque<MediaFile> results = new ArrayDeque<>(files.size());
-
-    for (final File file : files) {
-      final String mimeType = Files.probeContentType(file.toPath());
-
-      //noinspection UnstableApiUsage
-      if (StringUtils.isNoneEmpty(mimeType)
-          && !file.getAbsolutePath().contains("sample")
-          && MediaType.parse(mimeType).is(MediaType.ANY_VIDEO_TYPE)) {
-
-        results.add(MediaFileConverter.convert(file));
-      }
+    try {
+      Files.walk(Path.of(input)).filter(Files::isReadable).forEach(path -> process(path, results));
+    } catch (IOException e) {
+      log.warn("Issue processing stream {}", e.getMessage());
     }
 
     return results;
   }
 
-  @Override
-  public ArrayDeque<File> scanPictures(final String input) throws IOException {
+  private void process(final Path path, final ArrayDeque<MediaFile> results) {
 
-    final Collection<File> files =
-        FileUtils.listFiles(new File(input), TrueFileFilter.INSTANCE, null);
-
-    final ArrayDeque<File> results = new ArrayDeque<>(files.size());
-
-    for (final File file : files) {
-      final String mimeType = Files.probeContentType(file.toPath());
+    try {
+      final String mimeType = Files.probeContentType(path);
 
       //noinspection UnstableApiUsage
       if (StringUtils.isNoneEmpty(mimeType)
-          && MediaType.parse(mimeType).is(MediaType.ANY_IMAGE_TYPE)) {
-        results.add(file);
-      }
-    }
+          && !path.toFile().getAbsolutePath().contains("sample")
+          && MediaType.parse(mimeType).is(MediaType.ANY_VIDEO_TYPE)) {
 
-    return results;
+        results.add(MediaFileConverter.convert(path.toFile()));
+      }
+
+    } catch (IOException e) {
+      log.error("Unable to prob file {}", path);
+    }
   }
 }
