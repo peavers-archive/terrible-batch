@@ -17,12 +17,11 @@ public class DirectoryProcessor implements ItemProcessor<MediaFile, MediaFile> {
 
   @Override
   public MediaFile process(@NonNull final MediaFile input) {
-
-    final MediaFile output =
+    final MediaFile lookup =
         mediaFileRepository.findById(input.getId()).orElse(MediaFile.builder().build());
 
-    BeanUtils.copyProperties(input, output, "thumbnailPath", "thumbnails");
+    BeanUtils.copyProperties(input, lookup, "thumbnailPath", "thumbnails", "isIndexed", "indexed");
 
-    return output;
+    return lookup;
   }
 }

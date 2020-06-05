@@ -40,20 +40,20 @@ public class DirectoryBatch {
 
   private final MediaFileRepository mediaFileRepository;
 
+  @Bean(name = "io.terrible.batch.directory.jobs.reader")
   @StepScope
-  @Bean(name = "directoryScanReader")
   public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
 
     return new IteratorItemReader<>(scanService.scanVideos(dir));
   }
 
-  @Bean(name = "directoryScanProcessor")
+  @Bean(name = "io.terrible.batch.directory.jobs.processor")
   public DirectoryProcessor processor() {
 
     return new DirectoryProcessor(mediaFileRepository);
   }
 
-  @Bean(name = "directoryScanWriter")
+  @Bean(name = "io.terrible.batch.directory.jobs.writer")
   public ItemWriter<MediaFile> writer() {
 
     final MongoItemWriter<MediaFile> writer = new MongoItemWriter<>();
@@ -63,7 +63,7 @@ public class DirectoryBatch {
     return writer;
   }
 
-  @Bean(name = "directoryScannerStep")
+  @Bean(name = "io.terrible.batch.directory.jobs.directoryScannerStep")
   public Step directoryScannerStep() {
 
     return stepBuilderFactory
@@ -75,7 +75,7 @@ public class DirectoryBatch {
         .build();
   }
 
-  @Bean(name = "directoryScannerJob")
+  @Bean(name = "io.terrible.batch.directory.jobs.directoryScannerJob")
   public Job directoryScannerJob() {
 
     return jobBuilderFactory

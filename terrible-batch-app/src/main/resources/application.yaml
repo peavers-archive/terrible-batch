@@ -5,14 +5,14 @@ spring:
 batch:
   directory:
     default: ""
-    delay: 60000
+    delay: 61000
   cleaner:
-    delay: 60000
+    delay: 62000
   thumbnails:
     default: "/home/chris/.terrible/thumbnails/"
-    delay: 60000
+    delay: 63000
   search:
-    delay: 60000
+    delay: 64000
 
 search:
   host: "localhost"

@@ -20,6 +20,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -44,7 +45,7 @@ public class ThumbnailGeneratorBatch {
   private final MongoTemplate mongoTemplate;
 
   @StepScope
-  @Bean(name = "thumbnailGeneratorReader")
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.reader")
   public ItemReader<MediaFile> reader() {
 
     final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
@@ -61,13 +62,13 @@ public class ThumbnailGeneratorBatch {
     return reader;
   }
 
-  @Bean(name = "thumbnailGeneratorProcessor")
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.processor")
   public ThumbnailProcessor processor() {
 
     return new ThumbnailProcessor(thumbnailService);
   }
 
-  @Bean(name = "thumbnailGeneratorWriter")
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.writer")
   public ItemWriter<MediaFile> writer() {
 
     final MongoItemWriter<MediaFile> writer = new MongoItemWriter<>();
@@ -77,7 +78,7 @@ public class ThumbnailGeneratorBatch {
     return writer;
   }
 
-  @Bean(name = "thumbnailGeneratorJob")
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.thumbnailGeneratorJob")
   public Job thumbnailGeneratorJob() {
 
     return jobBuilderFactory
@@ -88,7 +89,7 @@ public class ThumbnailGeneratorBatch {
         .build();
   }
 
-  @Bean(name = "thumbnailGeneratorStep")
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.thumbnailGeneratorStep")
   public Step thumbnailGeneratorStep() {
 
     return stepBuilderFactory
@@ -101,8 +102,10 @@ public class ThumbnailGeneratorBatch {
         .build();
   }
 
-  @Bean(name = "partitionedStep")
-  public Step partitionedStep(Step thumbnailGeneratorStep) {
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.partitionedStep")
+  public Step partitionedStep(
+      @Qualifier("io.terrible.batch.thumbnails.jobs.thumbnailGeneratorStep")
+          Step thumbnailGeneratorStep) {
 
     return stepBuilderFactory
         .get("partitionedStep")

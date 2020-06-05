@@ -20,6 +20,7 @@ public class SearchProcessor implements ItemProcessor<MediaFile, MediaFile> {
   public MediaFile process(@NonNull final MediaFile mediaFile) {
 
     searchService.addToIndex(INDEX, mediaFile);
+
     mediaFile.setIndexed(true);
 
     return mediaFile;

@@ -2,7 +2,6 @@
 package io.terrible.batch.thumbnails.schedulers;
 
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -19,21 +18,25 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 public class ThumbnailGeneratorScheduler {
 
-  private final SimpleJobLauncher simpleJobLauncher;
+  private final SimpleJobLauncher launcher;
 
-  @Qualifier("thumbnailGeneratorJob")
-  private final Job thumbnailGeneratorJob;
+  private final Job job;
+
+  public ThumbnailGeneratorScheduler(
+      final SimpleJobLauncher launcher,
+      @Qualifier("io.terrible.batch.thumbnails.jobs.thumbnailGeneratorJob") final Job job) {
+
+    this.launcher = launcher;
+    this.job = job;
+  }
 
   @Scheduled(fixedDelayString = "${batch.thumbnails.delay}")
   public void schedule()
       throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
           JobRestartException, JobInstanceAlreadyCompleteException {
 
-    simpleJobLauncher.run(
-        thumbnailGeneratorJob,
-        new JobParametersBuilder().addDate("date", new Date()).toJobParameters());
+    launcher.run(job, new JobParametersBuilder().addDate("date", new Date()).toJobParameters());
   }
 }

@@ -41,8 +41,8 @@ public class SearchBatch {
 
   private final SearchService searchService;
 
-  @StepScope
   @Bean(name = "io.terrible.batch.search.jobs.reader")
+  @StepScope
   public ItemReader<MediaFile> reader() {
 
     final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
@@ -53,8 +53,8 @@ public class SearchBatch {
     reader.setTemplate(mongoTemplate);
     reader.setSort(map);
     reader.setTargetType(MediaFile.class);
-    reader.setQuery("{}");
-    reader.setSaveState(false);
+    reader.setQuery("{ isIndexed: false }");
+    reader.setSaveState(true);
 
     return reader;
   }

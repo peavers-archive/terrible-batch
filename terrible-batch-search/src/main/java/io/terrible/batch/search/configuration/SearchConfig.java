@@ -35,10 +35,11 @@ public class SearchConfig {
   }
 
   @Bean
-  public BulkProcessor bulkProcessor(RestHighLevelClient client) {
+  public BulkProcessor bulkProcessor() {
 
     final BiConsumer<BulkRequest, ActionListener<BulkResponse>> bulkConsumer =
-        (request, bulkListener) -> client.bulkAsync(request, RequestOptions.DEFAULT, bulkListener);
+        (request, bulkListener) ->
+            client().bulkAsync(request, RequestOptions.DEFAULT, bulkListener);
 
     return BulkProcessor.builder(bulkConsumer, new DebugListener()).build();
   }
@@ -54,24 +55,6 @@ public class SearchConfig {
         final long executionId, final BulkRequest request, final BulkResponse response) {
 
       log.info("Executed bulk request with [{}] requests", request.numberOfActions());
-      if (response.hasFailures()) {
-        final int[] failures = {0};
-        response
-            .iterator()
-            .forEachRemaining(
-                bulkItemResponse -> {
-                  if (bulkItemResponse.isFailed()) {
-                    failures[0]++;
-                    log.debug(
-                        "Error caught for [{}]/[{}]/[{}]: {}",
-                        bulkItemResponse.getIndex(),
-                        bulkItemResponse.getType(),
-                        bulkItemResponse.getId(),
-                        bulkItemResponse.getFailureMessage());
-                  }
-                });
-        log.warn("Got [{}] failures of [{}] requests", failures[0], request.numberOfActions());
-      }
     }
 
     public void afterBulk(

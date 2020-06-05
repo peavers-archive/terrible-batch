@@ -5,7 +5,6 @@ import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.repository.DirectoryRepository;
 import java.util.Date;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
@@ -21,18 +20,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 public class DirectoryScheduler {
+
+  private final SimpleJobLauncher launcher;
+
+  private final Job job;
 
   @Value("${batch.directory.default}")
   private String defaultDirectory;
 
   private final DirectoryRepository directoryRepository;
 
-  private final SimpleJobLauncher simpleJobLauncher;
+  public DirectoryScheduler(
+      final DirectoryRepository directoryRepository,
+      final SimpleJobLauncher launcher,
+      @Qualifier("io.terrible.batch.directory.jobs.directoryScannerJob") final Job job) {
 
-  @Qualifier("directoryScannerJob")
-  private final Job directoryScannerJob;
+    this.directoryRepository = directoryRepository;
+    this.launcher = launcher;
+    this.job = job;
+  }
 
   @Scheduled(fixedDelayString = "${batch.directory.delay}")
   public void schedule() {
@@ -42,22 +49,17 @@ public class DirectoryScheduler {
     if (StringUtils.isEmpty(directory.getPath())) {
       log.warn("No directory found, skipping job");
     } else {
-      execute(directory);
-    }
-  }
+      final JobParameters jobParameters =
+          new JobParametersBuilder()
+              .addDate("date", new Date())
+              .addString("directory", directory.getPath())
+              .toJobParameters();
 
-  private void execute(Directory directory) {
-
-    final JobParameters jobParameters =
-        new JobParametersBuilder()
-            .addDate("date", new Date())
-            .addString("directory", directory.getPath())
-            .toJobParameters();
-
-    try {
-      simpleJobLauncher.run(directoryScannerJob, jobParameters);
-    } catch (Exception e) {
-      log.error("Unable to run {} {} {}", directoryScannerJob.getName(), e.getMessage(), e);
+      try {
+        launcher.run(job, jobParameters);
+      } catch (Exception e) {
+        log.error("Unable to run {} {} {}", job.getName(), e.getMessage(), e);
+      }
     }
   }
 
