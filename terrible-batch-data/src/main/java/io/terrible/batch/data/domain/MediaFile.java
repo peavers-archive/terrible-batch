@@ -24,6 +24,8 @@ public class MediaFile {
 
   private String path;
 
+  private String virtualPath;
+
   private String thumbnailPath;
 
   private String extension;

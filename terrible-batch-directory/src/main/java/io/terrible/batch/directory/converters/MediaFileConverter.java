@@ -2,7 +2,12 @@
 package io.terrible.batch.directory.converters;
 
 import com.google.common.hash.Hashing;
+import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.domain.MediaFile;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,22 +18,20 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 
 /** Converts a file to a type of MediaFile */
 @Slf4j
 @UtilityClass
 public class MediaFileConverter {
 
-  public MediaFile convert(final File file) {
+  public MediaFile convert(final File file, final Directory directory) {
 
     return MediaFile.builder()
         .id(getId(file))
         .name(getName(file))
         .extension(getExtension(file))
-        .path(file.getAbsolutePath())
+        .path(getPath(file, directory))
+        .virtualPath(file.getAbsolutePath())
         .size(getSize(file))
         .createdTime(getCreationTime(file))
         .createdTime(getCreationTime(file))
@@ -118,5 +121,14 @@ public class MediaFileConverter {
     } catch (final IOException e) {
       return null;
     }
+  }
+
+  private String getPath(final File file, final Directory directory) {
+
+    final String virtualPath = "/terrible/terrible-media/";
+
+    return file.getAbsolutePath().contains(virtualPath)
+        ? file.getAbsolutePath().replace(virtualPath, directory.getPath())
+        : file.getAbsolutePath();
   }
 }

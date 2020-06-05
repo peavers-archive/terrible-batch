@@ -31,7 +31,8 @@ public class ThumbnailServiceImpl implements ThumbnailService {
    */
   @Override
   public ArrayDeque<String> createThumbnails(final Path input, final Path output, final int count)
-      throws UnableToCalculateDurationException, UnableToReadFileException {
+      throws UnableToCalculateDurationException, UnableToReadFileException, IOException,
+          InterruptedException {
 
     if (!Files.isReadable(input)) {
       throw new UnableToReadFileException(input.getFileName());
@@ -47,17 +48,13 @@ public class ThumbnailServiceImpl implements ThumbnailService {
 
       final double timestamp = (i - 0.5) * (duration / count) * 60;
 
-      try {
-        processService.execute(
-            CommandUtils.createThumbnail(
-                String.valueOf(round(timestamp)),
-                input.toFile().getAbsolutePath(),
-                thumbnailLocation.toString()));
+      processService.execute(
+          CommandUtils.createThumbnail(
+              String.valueOf(round(timestamp)),
+              input.toFile().getAbsolutePath(),
+              thumbnailLocation.toString()));
 
-        thumbnails.add(thumbnailLocation.toString());
-      } catch (final IOException | InterruptedException e) {
-        log.error("Unable to create thumbnails {}", e.getMessage());
-      }
+      thumbnails.add(thumbnailLocation.toString());
     }
 
     return thumbnails;
@@ -88,7 +85,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
 
     final File outputFile = output.toFile();
 
-    FileUtils.deleteQuietly(outputFile); // Empty the directory if its there.
+    FileUtils.deleteQuietly(outputFile);
 
     if (!outputFile.mkdirs()) {
       log.warn("Unable to create output directory, aborting {}", output);

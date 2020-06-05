@@ -1,6 +1,9 @@
 spring:
   application:
     name: terrible-batch-service
+  datasource:
+    hikari:
+      transaction-isolation: ISOLATION_REPEATABLE_READ
 
 batch:
   directory:

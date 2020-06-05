@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 
 @Slf4j
 @Component
@@ -28,6 +29,7 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
 
   @Override
   public MediaFile process(final MediaFile mediaFile) {
+    ArrayDeque<String> thumbnails = new ArrayDeque<>(NUMBER_OF_THUMBNAILS);
 
     mediaFile.setThumbnailPath(FileUtils.getThumbnailDirectory(baseDir, mediaFile));
 
@@ -35,13 +37,12 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
     final Path output = Path.of(mediaFile.getThumbnailPath());
 
     try {
-      mediaFile.setThumbnails(
-          thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS));
-
-      log.info("Thumbnails done for: {}", mediaFile.getName());
-    } catch (UnableToCalculateDurationException | UnableToReadFileException exception) {
+      thumbnails = thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS);
+    } catch (UnableToCalculateDurationException | UnableToReadFileException | Exception exception) {
       mediaFile.setIgnored(true);
     }
+
+    mediaFile.setThumbnails(thumbnails);
 
     return mediaFile;
   }
