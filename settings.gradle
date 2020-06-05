@@ -5,4 +5,4 @@ include 'terrible-batch-data'
 include 'terrible-batch-cleaner'
 include 'terrible-batch-directory'
 include 'terrible-batch-thumbnails'
-
+include 'terrible-batch-search'

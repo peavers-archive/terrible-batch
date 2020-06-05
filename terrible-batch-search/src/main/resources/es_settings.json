@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "fscrawler_path": {
+          "tokenizer": "keyword",
+          "filter": [
+            "word_delimiter",
+            "lowercase"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "keyword",
+        "store": true
+      },
+      "path": {
+        "type": "text",
+        "analyzer": "fscrawler_path"
+      }
+    }
+  }
+}

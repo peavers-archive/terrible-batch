@@ -1,13 +1,13 @@
 /* Licensed under Apache-2.0 */
-package io.terrible.batch.directory.jobs;
+package io.terrible.batch.search.jobs;
 
+import io.micrometer.core.instrument.search.Search;
 import io.terrible.batch.data.domain.MediaFile;
-import io.terrible.batch.data.repository.MediaFileRepository;
-import io.terrible.batch.directory.processors.DirectoryProcessor;
-import io.terrible.batch.directory.services.ScanService;
+import io.terrible.batch.search.listeners.SearchJobListener;
+import io.terrible.batch.search.processors.SearchProcessor;
+import io.terrible.batch.search.services.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -17,18 +17,23 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
-import org.springframework.batch.item.support.IteratorItemReader;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Configuration
+@EnableScheduling
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class DirectoryBatch {
+public class SearchBatch {
 
   private final JobBuilderFactory jobBuilderFactory;
 
@@ -36,24 +41,32 @@ public class DirectoryBatch {
 
   private final MongoTemplate mongoTemplate;
 
-  private final ScanService scanService;
-
-  private final MediaFileRepository mediaFileRepository;
+  private final SearchService searchService;
 
   @StepScope
-  @Bean(name = "directoryScanReader")
-  public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
+  @Bean(name = "searchReader")
+  public ItemReader<MediaFile> reader() {
 
-    return new IteratorItemReader<>(scanService.scanVideos(dir));
+    final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
+
+    final Map<String, Sort.Direction> map = new HashMap<>();
+    map.put("_id", Sort.Direction.DESC);
+
+    reader.setTemplate(mongoTemplate);
+    reader.setSort(map);
+    reader.setTargetType(MediaFile.class);
+    reader.setQuery("{}");
+    reader.setSaveState(false);
+
+    return reader;
   }
 
-  @Bean(name = "directoryScanProcessor")
-  public DirectoryProcessor processor() {
-
-    return new DirectoryProcessor(mediaFileRepository);
+  @Bean(name = "searchProcessor")
+  public SearchProcessor processor() {
+    return new SearchProcessor(searchService);
   }
 
-  @Bean(name = "directoryScanWriter")
+  @Bean(name = "searchWriter")
   public ItemWriter<MediaFile> writer() {
 
     final MongoItemWriter<MediaFile> writer = new MongoItemWriter<>();
@@ -63,25 +76,26 @@ public class DirectoryBatch {
     return writer;
   }
 
-  @Bean(name = "directoryScannerStep")
-  public Step directoryScannerStep() {
+  @Bean(name = "searchStep")
+  public Step searchStep() {
 
     return stepBuilderFactory
-        .get("directoryScannerStep")
-        .<MediaFile, MediaFile>chunk(1)
-        .reader(reader(StringUtils.EMPTY))
+        .get("searchStep")
+        .<MediaFile, MediaFile>chunk(100)
+        .reader(reader())
         .processor(processor())
         .writer(writer())
         .build();
   }
 
-  @Bean(name = "directoryScannerJob")
-  public Job directoryScannerJob() {
+  @Bean(name = "searchJob")
+  public Job searchJob() {
 
     return jobBuilderFactory
-        .get("directoryScannerJob")
+        .get("searchJob")
+        .listener(new SearchJobListener(searchService))
         .incrementer(new RunIdIncrementer())
-        .flow(directoryScannerStep())
+        .flow(searchStep())
         .end()
         .build();
   }

@@ -7,10 +7,17 @@ batch:
     default: ""
     delay: 60000
   cleaner:
-    delay: 70000
+    delay: 60000
   thumbnails:
     default: "/home/chris/.terrible/thumbnails/"
-    delay: 80000
+    delay: 60000
+  search:
+    delay: 60000
+
+search:
+  host: "localhost"
+  port: 9200
+  scheme: "http"
 
 ---
 spring:
@@ -24,3 +31,6 @@ batch:
     default: "/terrible/terrible-media/"
   thumbnails:
     default: "/terrible/terrible-thumbnails/"
+
+search:
+  host: "terrible-search"
