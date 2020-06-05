@@ -11,10 +11,6 @@ batch:
   thumbnails:
     default: "/home/chris/.terrible/thumbnails/"
     delay: 60000
-
-search:
-  endpoint: "http://localhost:8080"
-    delay: 60000
   search:
     delay: 60000
 
@@ -35,9 +31,6 @@ batch:
     default: "/terrible/terrible-media/"
   thumbnails:
     default: "/terrible/terrible-thumbnails/"
-
-search:
-  endpoint: "http://terrible-monolith:8080"
 
 search:
   host: "terrible-search"

@@ -42,7 +42,7 @@ public class SearchBatch {
   private final SearchService searchService;
 
   @StepScope
-  @Bean(name = "searchReader")
+  @Bean(name = "io.terrible.batch.search.jobs.reader")
   public ItemReader<MediaFile> reader() {
 
     final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
@@ -59,12 +59,12 @@ public class SearchBatch {
     return reader;
   }
 
-  @Bean(name = "searchProcessor")
+  @Bean(name = "io.terrible.batch.search.jobs.processor")
   public SearchProcessor processor() {
     return new SearchProcessor(searchService);
   }
 
-  @Bean(name = "searchWriter")
+  @Bean(name = "io.terrible.batch.search.jobs.writer")
   public ItemWriter<MediaFile> writer() {
 
     final MongoItemWriter<MediaFile> writer = new MongoItemWriter<>();
@@ -74,7 +74,7 @@ public class SearchBatch {
     return writer;
   }
 
-  @Bean(name = "searchStep")
+  @Bean(name = "io.terrible.batch.search.jobs.searchStep")
   public Step searchStep() {
 
     return stepBuilderFactory
@@ -86,7 +86,7 @@ public class SearchBatch {
         .build();
   }
 
-  @Bean(name = "searchJob")
+  @Bean(name = "io.terrible.batch.search.jobs.searchJob")
   public Job searchJob() {
 
     return jobBuilderFactory

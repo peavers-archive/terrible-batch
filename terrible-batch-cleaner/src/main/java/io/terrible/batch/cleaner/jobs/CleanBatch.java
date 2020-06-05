@@ -39,7 +39,7 @@ public class CleanBatch {
   private final MediaFileRepository mediaFileRepository;
 
   @StepScope
-  @Bean(name = "cleanReader")
+  @Bean(name = "io.terrible.batch.cleaner.jobs.reader")
   public ItemReader<MediaFile> reader() {
 
     final MongoItemReader<MediaFile> reader = new MongoItemReader<>();
@@ -56,13 +56,13 @@ public class CleanBatch {
     return reader;
   }
 
-  @Bean(name = "cleanProcessor")
+  @Bean(name = "io.terrible.batch.cleaner.jobs.processor")
   public CleanProcessor processor() {
 
     return new CleanProcessor(mediaFileRepository);
   }
 
-  @Bean(name = "cleanWriter")
+  @Bean(name = "io.terrible.batch.cleaner.jobs.writer")
   public ItemWriter<MediaFile> writer() {
 
     log.info("Writing for cleaner");
@@ -74,7 +74,7 @@ public class CleanBatch {
     return writer;
   }
 
-  @Bean(name = "cleanStep")
+  @Bean(name = "io.terrible.batch.cleaner.jobs.cleanStep")
   public Step cleanStep() {
 
     return stepBuilderFactory
@@ -86,7 +86,7 @@ public class CleanBatch {
         .build();
   }
 
-  @Bean(name = "cleanJob")
+  @Bean(name = "io.terrible.batch.cleaner.jobs.cleanJob")
   public Job directoryScannerJob() {
 
     return jobBuilderFactory

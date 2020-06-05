@@ -2,7 +2,6 @@
 package io.terrible.batch.search.schedulers;
 
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -19,20 +18,25 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 public class SearchScheduler {
 
-  private final SimpleJobLauncher simpleJobLauncher;
+  private final SimpleJobLauncher launcher;
 
-  @Qualifier("searchJob")
-  private final Job searchJob;
+  private final Job job;
+
+  public SearchScheduler(
+      final SimpleJobLauncher launcher,
+      @Qualifier("io.terrible.batch.search.jobs.searchJob") final Job job) {
+
+    this.launcher = launcher;
+    this.job = job;
+  }
 
   @Scheduled(fixedDelayString = "${batch.search.delay}")
   public void schedule()
       throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
           JobRestartException, JobInstanceAlreadyCompleteException {
 
-    simpleJobLauncher.run(
-        searchJob, new JobParametersBuilder().addDate("date", new Date()).toJobParameters());
+    launcher.run(job, new JobParametersBuilder().addDate("date", new Date()).toJobParameters());
   }
 }

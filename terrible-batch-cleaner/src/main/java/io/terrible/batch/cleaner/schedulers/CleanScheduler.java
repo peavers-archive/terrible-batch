@@ -2,7 +2,6 @@
 package io.terrible.batch.cleaner.schedulers;
 
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -16,29 +15,29 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 public class CleanScheduler {
 
-  private final SimpleJobLauncher simpleJobLauncher;
+  private final SimpleJobLauncher launcher;
 
-  @Qualifier("cleanJob")
-  private final Job cleanJob;
+  private final Job job;
+
+  public CleanScheduler(
+      final SimpleJobLauncher launcher,
+      @Qualifier("io.terrible.batch.cleaner.jobs" + ".cleanJob") final Job job) {
+
+    this.launcher = launcher;
+    this.job = job;
+  }
 
   @Scheduled(fixedDelayString = "${batch.cleaner.delay}")
   public void schedule() {
-
-    execute();
-  }
-
-  private void execute() {
-
     final JobParameters jobParameters =
         new JobParametersBuilder().addDate("date", new Date()).toJobParameters();
 
     try {
-      simpleJobLauncher.run(cleanJob, jobParameters);
+      launcher.run(job, jobParameters);
     } catch (Exception e) {
-      log.error("Unable to run {} {} {}", cleanJob.getName(), e.getMessage(), e);
+      log.error("Unable to run {} {} {}", job.getName(), e.getMessage(), e);
     }
   }
 }
