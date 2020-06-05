@@ -41,6 +41,9 @@ public class DirectoryBatch {
 
   private final MediaFileRepository mediaFileRepository;
 
+  @Value("${search.endpoint}")
+  private String searchEndpoint;
+
   @StepScope
   @Bean(name = "directoryScanReader")
   public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
@@ -79,7 +82,10 @@ public class DirectoryBatch {
   @Bean(name = "searchIndexStep")
   public Step searchIndexStep() {
 
-    return stepBuilderFactory.get("searchIndexStep").tasklet(new SearchIndexTasklet()).build();
+    return stepBuilderFactory
+        .get("searchIndexStep")
+        .tasklet(new SearchIndexTasklet(searchEndpoint))
+        .build();
   }
 
   @Bean(name = "directoryScannerJob")
