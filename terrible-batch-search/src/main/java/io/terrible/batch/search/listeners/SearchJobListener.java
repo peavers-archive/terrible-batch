@@ -1,13 +1,13 @@
+/* Licensed under Apache-2.0 */
 package io.terrible.batch.search.listeners;
 
 import io.terrible.batch.search.services.SearchService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Slf4j
 @Component

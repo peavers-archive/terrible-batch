@@ -5,7 +5,6 @@ import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.MediaFileRepository;
 import io.terrible.batch.directory.processors.DirectoryProcessor;
 import io.terrible.batch.directory.services.ScanService;
-import io.terrible.batch.directory.tasklet.SearchIndexTasklet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

@@ -2,7 +2,6 @@
 package io.terrible.batch.search.services;
 
 import io.terrible.batch.data.domain.MediaFile;
-
 import java.io.IOException;
 
 public interface SearchService {

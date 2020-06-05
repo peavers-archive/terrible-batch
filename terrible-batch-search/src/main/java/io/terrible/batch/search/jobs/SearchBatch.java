@@ -1,11 +1,12 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.search.jobs;
 
-import io.micrometer.core.instrument.search.Search;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.search.listeners.SearchJobListener;
 import io.terrible.batch.search.processors.SearchProcessor;
 import io.terrible.batch.search.services.SearchService;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -24,9 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Configuration

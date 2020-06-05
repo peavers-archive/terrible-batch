@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.search.configuration;
 
+import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
@@ -13,8 +14,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.function.BiConsumer;
 
 @Slf4j
 @Configuration
