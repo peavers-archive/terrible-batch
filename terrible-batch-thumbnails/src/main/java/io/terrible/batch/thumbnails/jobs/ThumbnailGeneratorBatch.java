@@ -56,7 +56,7 @@ public class ThumbnailGeneratorBatch {
     reader.setTemplate(mongoTemplate);
     reader.setSort(map);
     reader.setTargetType(MediaFile.class);
-    reader.setQuery("{ 'thumbnails.11': { $exists: false} }");
+    reader.setQuery("{ 'thumbnails.11': { $exists: false }, isIgnored: false }");
     reader.setSaveState(false);
 
     return reader;

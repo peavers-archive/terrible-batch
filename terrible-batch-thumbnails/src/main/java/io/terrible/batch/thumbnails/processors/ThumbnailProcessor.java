@@ -2,14 +2,17 @@
 package io.terrible.batch.thumbnails.processors;
 
 import io.terrible.batch.data.domain.MediaFile;
+import io.terrible.batch.thumbnails.exceptions.UnableToCalculateDurationException;
+import io.terrible.batch.thumbnails.exceptions.UnableToReadFileException;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
 import io.terrible.batch.thumbnails.utils.FileUtils;
-import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
 
 @Slf4j
 @Component
@@ -31,9 +34,14 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
     final Path input = Path.of(mediaFile.getPath());
     final Path output = Path.of(mediaFile.getThumbnailPath());
 
-    mediaFile.setThumbnails(thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS));
+    try {
+      mediaFile.setThumbnails(
+          thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS));
 
-    log.info("Thumbnails done for: {}", mediaFile.getName());
+      log.info("Thumbnails done for: {}", mediaFile.getName());
+    } catch (UnableToCalculateDurationException | UnableToReadFileException exception) {
+      mediaFile.setIgnored(true);
+    }
 
     return mediaFile;
   }

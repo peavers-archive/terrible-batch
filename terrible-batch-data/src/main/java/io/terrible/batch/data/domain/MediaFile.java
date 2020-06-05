@@ -1,14 +1,15 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.data.domain;
 
-import java.time.LocalDateTime;
-import java.util.ArrayDeque;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 
 @Data
 @Builder
@@ -40,4 +41,6 @@ public class MediaFile {
   private LocalDateTime lastWatched;
 
   private boolean isIndexed;
+
+  private boolean isIgnored;
 }

@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.thumbnails.services;
 
+import io.terrible.batch.thumbnails.exceptions.UnableToCalculateDurationException;
+import io.terrible.batch.thumbnails.exceptions.UnableToReadFileException;
 import io.terrible.batch.thumbnails.utils.CommandUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +30,14 @@ public class ThumbnailServiceImpl implements ThumbnailService {
    * FFMPEG jump to those time stamps to grab the closest frame we find.
    */
   @Override
-  public ArrayDeque<String> createThumbnails(final Path input, final Path output, final int count) {
+  public ArrayDeque<String> createThumbnails(final Path input, final Path output, final int count)
+      throws UnableToCalculateDurationException, UnableToReadFileException {
 
     if (!Files.isReadable(input)) {
-      log.warn("Unable to read input file, aborting {}", input.getFileName());
-
-      return new ArrayDeque<>(0);
+      throw new UnableToReadFileException(input.getFileName());
     }
 
-    double duration = calculateDuration(input);
-
-    if (duration == -1) {
-      log.warn("Unable to calculate duration, aborting {}", input.getFileName());
-
-      return new ArrayDeque<>(0);
-    } else {
-      duration = duration / 60;
-    }
+    double duration = calculateDuration(input) / 60;
 
     final File outputDirectory = createOutputDirectory(output);
     final ArrayDeque<String> thumbnails = new ArrayDeque<>(count);
@@ -74,7 +67,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
    * Use FFMPEG to calculate the total duration of the video. This is used to work out where to
    * create the thumbnails.
    */
-  private double calculateDuration(final Path input) {
+  private double calculateDuration(final Path input) throws UnableToCalculateDurationException {
 
     try {
       final String output =
@@ -83,9 +76,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
       return StringUtils.isNotBlank(output) ? Double.parseDouble(output) : -1;
 
     } catch (final IOException | InterruptedException e) {
-      log.warn("Unable to calculate duration, aborting {}", input.getFileName());
-
-      return -1;
+      throw new UnableToCalculateDurationException(input.getFileName());
     }
   }
 
