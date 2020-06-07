@@ -4,8 +4,6 @@ package io.terrible.batch.thumbnails.jobs;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -28,6 +26,9 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Configuration
@@ -105,7 +106,7 @@ public class ThumbnailGeneratorBatch {
   @Bean(name = "io.terrible.batch.thumbnails.jobs.partitionedStep")
   public Step partitionedStep(
       @Qualifier("io.terrible.batch.thumbnails.jobs.thumbnailGeneratorStep")
-          Step thumbnailGeneratorStep) {
+          final Step thumbnailGeneratorStep) {
 
     return stepBuilderFactory
         .get("partitionedStep")

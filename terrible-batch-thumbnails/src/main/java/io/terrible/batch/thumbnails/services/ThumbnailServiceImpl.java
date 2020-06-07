@@ -38,7 +38,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
       throw new UnableToReadFileException(input.getFileName());
     }
 
-    double duration = calculateDuration(input) / 60;
+    final double duration = calculateDuration(input) / 60;
 
     final File outputDirectory = createOutputDirectory(output);
     final ArrayDeque<String> thumbnails = new ArrayDeque<>(count);

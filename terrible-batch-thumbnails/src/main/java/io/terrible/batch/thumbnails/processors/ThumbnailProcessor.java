@@ -20,12 +20,12 @@ import java.util.ArrayDeque;
 @RequiredArgsConstructor
 public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
 
-  @Value("${batch.thumbnails.default}")
-  private String baseDir;
-
   private static final int NUMBER_OF_THUMBNAILS = 12;
 
   private final ThumbnailService thumbnailService;
+
+  @Value("${batch.thumbnails.default}")
+  private String baseDir;
 
   @Override
   public MediaFile process(final MediaFile mediaFile) {
@@ -38,7 +38,9 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
 
     try {
       thumbnails = thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS);
-    } catch (UnableToCalculateDurationException | UnableToReadFileException | Exception exception) {
+    } catch (final UnableToCalculateDurationException
+        | UnableToReadFileException
+        | Exception exception) {
       mediaFile.setIgnored(true);
     }
 

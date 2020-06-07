@@ -2,10 +2,11 @@
 package io.terrible.batch.thumbnails.utils;
 
 import io.terrible.batch.data.domain.MediaFile;
-import java.io.File;
-import java.nio.file.Files;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.nio.file.Files;
 
 @Slf4j
 @UtilityClass
@@ -23,7 +24,7 @@ public class FileUtils {
    * permissions fail or the IO is unable to create. If the file directory already exists, the path
    * is returned and no IO operations are preformed.
    */
-  private String createDirectory(File file) {
+  private String createDirectory(final File file) {
 
     if (Files.exists(file.toPath())) {
       return file.getAbsolutePath();

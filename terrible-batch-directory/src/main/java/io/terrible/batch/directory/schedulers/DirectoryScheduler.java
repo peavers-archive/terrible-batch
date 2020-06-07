@@ -3,8 +3,6 @@ package io.terrible.batch.directory.schedulers;
 
 import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.repository.DirectoryRepository;
-import java.util.Date;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.Job;
@@ -17,6 +15,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @Component
 @EnableScheduling
@@ -26,10 +27,10 @@ public class DirectoryScheduler {
 
   private final Job job;
 
+  private final DirectoryRepository directoryRepository;
+
   @Value("${batch.directory.default}")
   private String defaultDirectory;
-
-  private final DirectoryRepository directoryRepository;
 
   public DirectoryScheduler(
       final DirectoryRepository directoryRepository,
@@ -57,7 +58,7 @@ public class DirectoryScheduler {
 
       try {
         launcher.run(job, jobParameters);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("Unable to run {} {} {}", job.getName(), e.getMessage(), e);
       }
     }

@@ -12,7 +12,7 @@ batch:
   cleaner:
     delay: 62000
   thumbnails:
-    default: "/home/chris/.terrible/thumbnails/"
+    default: "${HOME}/.terrible/thumbnails/"
     delay: 63000
   search:
     delay: 64000

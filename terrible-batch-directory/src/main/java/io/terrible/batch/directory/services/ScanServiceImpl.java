@@ -27,7 +27,6 @@ public class ScanServiceImpl implements ScanService {
   public ArrayDeque<MediaFile> scanVideos(final String input) {
 
     final Directory directory = directoryRepository.findAll().get(0);
-
     final ArrayDeque<MediaFile> results = new ArrayDeque<>();
 
     if (StringUtils.isEmpty(input)) {
@@ -38,8 +37,8 @@ public class ScanServiceImpl implements ScanService {
       Files.walk(Path.of(input))
           .filter(Files::isReadable)
           .forEach(path -> process(path, directory, results));
-    } catch (IOException e) {
-      log.warn("Issue processing stream {}", e.getMessage());
+    } catch (final IOException e) {
+      log.warn("Issue processing stream {} {}", e.getCause(), e);
     }
 
     return results;
@@ -59,7 +58,7 @@ public class ScanServiceImpl implements ScanService {
         results.add(MediaFileConverter.convert(path.toFile(), directory));
       }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Unable to prob file {}", path);
     }
   }

@@ -3,8 +3,6 @@ package io.terrible.batch.search.services;
 
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.search.utils.JsonUtils;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -21,6 +19,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,6 @@ public class SearchServiceImpl implements SearchService {
   public void createIndex(final String index) {
 
     if (isExistingIndex(index, client)) {
-      log.info("Index already exists, skipping creation");
       return;
     }
 
@@ -49,7 +49,7 @@ public class SearchServiceImpl implements SearchService {
         client
             .cluster()
             .health(new ClusterHealthRequest(index).waitForYellowStatus(), RequestOptions.DEFAULT);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.warn("Unable to create index {}", e.getMessage());
       }
     }
@@ -74,17 +74,17 @@ public class SearchServiceImpl implements SearchService {
 
     try {
       return FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Unable to get search settings file {}", e.getMessage());
       return null;
     }
   }
 
-  private boolean isExistingIndex(final String index, RestHighLevelClient client) {
+  private boolean isExistingIndex(final String index, final RestHighLevelClient client) {
 
     try {
       return client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       return true;
     }
   }
