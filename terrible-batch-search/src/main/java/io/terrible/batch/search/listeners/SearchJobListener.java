@@ -21,7 +21,7 @@ public class SearchJobListener implements JobExecutionListener {
 
     try {
       searchService.createIndex("media-files");
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Unable to create index {}", e.getMessage());
     }
   }

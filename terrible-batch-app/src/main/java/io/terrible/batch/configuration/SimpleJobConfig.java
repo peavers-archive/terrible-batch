@@ -16,7 +16,7 @@ public class SimpleJobConfig {
   @Bean
   public SimpleJobLauncher simpleJobLauncher() {
 
-    SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
+    final SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
     simpleJobLauncher.setJobRepository(jobRepository);
 
     return simpleJobLauncher;

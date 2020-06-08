@@ -36,7 +36,7 @@ public class CleanScheduler {
 
     try {
       launcher.run(job, jobParameters);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Unable to run {} {} {}", job.getName(), e.getMessage(), e);
     }
   }
