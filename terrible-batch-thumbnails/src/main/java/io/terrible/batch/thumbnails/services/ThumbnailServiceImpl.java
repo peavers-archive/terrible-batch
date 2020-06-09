@@ -1,22 +1,22 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.thumbnails.services;
 
+import static org.apache.commons.math3.util.FastMath.round;
+
 import io.terrible.batch.thumbnails.exceptions.UnableToCalculateDurationException;
 import io.terrible.batch.thumbnails.exceptions.UnableToReadFileException;
 import io.terrible.batch.thumbnails.utils.CommandUtils;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayDeque;
-
-import static org.apache.commons.math3.util.FastMath.round;
 
 @Slf4j
 @Service
@@ -44,7 +44,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
     final ArrayDeque<String> thumbnails = new ArrayDeque<>(count);
 
     for (int i = 1; i <= count; i++) {
-      final Path thumbnailLocation = Path.of(String.format("%s/00%d.jpg", outputDirectory, i));
+      final Path thumbnailLocation = Paths.get(String.format("%s/00%d.jpg", outputDirectory, i));
 
       final double timestamp = (i - 0.5) * (duration / count) * 60;
 

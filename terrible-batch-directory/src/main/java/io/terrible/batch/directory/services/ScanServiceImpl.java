@@ -6,15 +6,15 @@ import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.DirectoryRepository;
 import io.terrible.batch.directory.converters.MediaFileConverter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayDeque;
 
 @Slf4j
 @Service
@@ -34,7 +34,7 @@ public class ScanServiceImpl implements ScanService {
     }
 
     try {
-      Files.walk(Path.of(input))
+      Files.walk(Paths.get(input))
           .filter(Files::isReadable)
           .forEach(path -> process(path, directory, results));
     } catch (final IOException e) {

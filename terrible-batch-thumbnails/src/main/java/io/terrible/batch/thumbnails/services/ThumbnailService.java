@@ -3,7 +3,6 @@ package io.terrible.batch.thumbnails.services;
 
 import io.terrible.batch.thumbnails.exceptions.UnableToCalculateDurationException;
 import io.terrible.batch.thumbnails.exceptions.UnableToReadFileException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -11,5 +10,6 @@ import java.util.ArrayDeque;
 public interface ThumbnailService {
 
   ArrayDeque<String> createThumbnails(Path input, Path output, int count)
-          throws UnableToCalculateDurationException, UnableToReadFileException, IOException, InterruptedException;
+      throws UnableToCalculateDurationException, UnableToReadFileException, IOException,
+          InterruptedException;
 }

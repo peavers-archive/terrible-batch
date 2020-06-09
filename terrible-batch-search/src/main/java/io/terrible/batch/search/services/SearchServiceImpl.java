@@ -3,6 +3,8 @@ package io.terrible.batch.search.services;
 
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.search.utils.JsonUtils;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -18,9 +20,6 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service

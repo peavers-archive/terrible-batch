@@ -2,11 +2,10 @@
 package io.terrible.batch.thumbnails.utils;
 
 import io.terrible.batch.data.domain.MediaFile;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.nio.file.Files;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @UtilityClass
