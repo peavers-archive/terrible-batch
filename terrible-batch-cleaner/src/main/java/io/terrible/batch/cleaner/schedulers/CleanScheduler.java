@@ -23,7 +23,7 @@ public class CleanScheduler {
 
   public CleanScheduler(
       final SimpleJobLauncher launcher,
-      @Qualifier("io.terrible.batch.cleaner.jobs" + ".cleanJob") final Job job) {
+      @Qualifier("io.terrible.batch.cleaner.jobs.cleanJob") final Job job) {
 
     this.launcher = launcher;
     this.job = job;

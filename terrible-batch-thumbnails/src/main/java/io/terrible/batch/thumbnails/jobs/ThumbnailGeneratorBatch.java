@@ -4,8 +4,6 @@ package io.terrible.batch.thumbnails.jobs;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -29,6 +27,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Configuration
 @EnableScheduling
@@ -43,6 +44,13 @@ public class ThumbnailGeneratorBatch {
   private final StepBuilderFactory stepBuilderFactory;
 
   private final MongoTemplate mongoTemplate;
+
+  /**
+   * Go easy on the CPU. Make sure we the number of CPUs divided by 4. However we need to also make
+   * sure that is a whole number and not something like 0.25 for a one core system.
+   */
+  private static final int WORKER_THREAD_COUNT =
+      (int) Math.ceil(Runtime.getRuntime().availableProcessors() >> 2);
 
   @StepScope
   @Bean(name = "io.terrible.batch.thumbnails.jobs.reader")
@@ -64,6 +72,8 @@ public class ThumbnailGeneratorBatch {
 
   @Bean(name = "io.terrible.batch.thumbnails.jobs.processor")
   public ThumbnailProcessor processor() {
+
+    log.info("WORKER THREADS = {}", WORKER_THREAD_COUNT);
 
     return new ThumbnailProcessor(thumbnailService);
   }
@@ -94,7 +104,7 @@ public class ThumbnailGeneratorBatch {
 
     return stepBuilderFactory
         .get("thumbnailGeneratorStep")
-        .<MediaFile, MediaFile>chunk(6)
+        .<MediaFile, MediaFile>chunk(WORKER_THREAD_COUNT)
         .reader(reader())
         .processor(processor())
         .writer(writer())
@@ -111,11 +121,11 @@ public class ThumbnailGeneratorBatch {
         .get("partitionedStep")
         .partitioner(thumbnailGeneratorStep)
         .partitioner("thumbnailGeneratorStep", new SimplePartitioner())
-        .gridSize(6)
+        .gridSize(WORKER_THREAD_COUNT)
         .build();
   }
 
-  @Bean
+  @Bean(name = "io.terrible.batch.thumbnails.jobs.taskExecutor")
   public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("thumbnail_task");
   }

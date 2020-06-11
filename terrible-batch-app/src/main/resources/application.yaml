@@ -4,20 +4,20 @@ spring:
 
 batch:
   directory:
-    default: ""
-    delay: 61000
+    default: "${HOME}/.terrible/media/"
+    delay: 60000
   cleaner:
-    delay: 62000
+    delay: 60000
   thumbnails:
     default: "${HOME}/.terrible/thumbnails/"
-    delay: 63000
+    delay: 60000
   search:
-    delay: 64000
+    delay: 60000
 
 search:
+  scheme: "http"
   host: "localhost"
   port: 9200
-  scheme: "http"
 
 ---
 spring:
