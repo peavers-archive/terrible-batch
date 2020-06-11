@@ -6,7 +6,6 @@ import io.terrible.batch.data.repository.MediaFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.lang.NonNull;
 
 @Slf4j
@@ -20,7 +19,15 @@ public class DirectoryProcessor implements ItemProcessor<MediaFile, MediaFile> {
     final MediaFile lookup =
         mediaFileRepository.findById(input.getId()).orElse(MediaFile.builder().build());
 
-    BeanUtils.copyProperties(input, lookup, "thumbnailPath", "thumbnails", "isIndexed", "indexed");
+    lookup.setId(input.getId());
+    lookup.setName(input.getName());
+    lookup.setPath(input.getPath());
+    lookup.setExtension(input.getExtension());
+    lookup.setSize(input.getSize());
+    lookup.setCreatedTime(input.getCreatedTime());
+    lookup.setLastAccessTime(input.getLastAccessTime());
+    lookup.setLastModifiedTime(input.getLastModifiedTime());
+    lookup.setLastWatched(input.getLastWatched());
 
     return lookup;
   }
