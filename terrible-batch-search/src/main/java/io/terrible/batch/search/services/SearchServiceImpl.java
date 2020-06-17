@@ -3,11 +3,9 @@ package io.terrible.batch.search.services;
 
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.search.utils.JsonUtils;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -18,8 +16,11 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 @Slf4j
 @Service
@@ -74,10 +75,11 @@ public class SearchServiceImpl implements SearchService {
   }
 
   private String getSettings() {
-    final Resource resource = new ClassPathResource("es_settings.json");
-
     try {
-      return FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
+      final ClassPathResource classPathResource = new ClassPathResource("es_settings.json");
+      final InputStream inputStream = classPathResource.getInputStream();
+
+      return IOUtils.toString(inputStream, Charset.defaultCharset());
     } catch (final IOException e) {
       log.error("Unable to get search settings file {}", e.getMessage());
       return null;
