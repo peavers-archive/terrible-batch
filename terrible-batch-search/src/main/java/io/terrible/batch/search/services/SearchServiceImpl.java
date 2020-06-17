@@ -76,10 +76,9 @@ public class SearchServiceImpl implements SearchService {
 
   private String getSettings() {
     try {
-      final ClassPathResource classPathResource = new ClassPathResource("es_settings.json");
-      final InputStream inputStream = classPathResource.getInputStream();
+      final InputStream stream = new ClassPathResource("es_settings.json").getInputStream();
 
-      return IOUtils.toString(inputStream, Charset.defaultCharset());
+      return IOUtils.toString(stream, Charset.defaultCharset());
     } catch (final IOException e) {
       log.error("Unable to get search settings file {}", e.getMessage());
       return null;
