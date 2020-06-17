@@ -33,11 +33,16 @@ public class SearchServiceImpl implements SearchService {
   @Override
   public void createIndex(final String index) {
 
+    log.info("Attempting to create index {}", index);
+
     if (isExistingIndex(index, client)) {
+      log.info("Index {} already exists, returning", index);
       return;
     }
 
     final String indexSettings = getSettings();
+
+    log.info("Creating index with settings {}", indexSettings);
 
     if (StringUtils.isNotEmpty(indexSettings)) {
       final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
