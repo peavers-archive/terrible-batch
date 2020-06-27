@@ -1,17 +1,19 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.thumbnails.services;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -26,7 +28,7 @@ public class ProcessServiceImpl implements ProcessService {
     final String output = readConsole(process.getInputStream());
     final String error = readConsole(process.getErrorStream());
 
-    process.waitFor();
+    process.waitFor(5, TimeUnit.MINUTES);
 
     logResult(output, error);
 

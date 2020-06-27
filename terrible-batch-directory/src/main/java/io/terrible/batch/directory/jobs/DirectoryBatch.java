@@ -42,9 +42,10 @@ public class DirectoryBatch {
 
   @Bean(name = "io.terrible.batch.directory.jobs.reader")
   @StepScope
-  public ItemReader<MediaFile> reader(@Value("#{jobParameters['directory']}") final String dir) {
+  public ItemReader<MediaFile> reader(
+      @Value("#{jobParameters['directory']}") final String directory) {
 
-    return new IteratorItemReader<>(scanService.scanVideos(dir));
+    return new IteratorItemReader<>(scanService.scanVideos(directory));
   }
 
   @Bean(name = "io.terrible.batch.directory.jobs.processor")

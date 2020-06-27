@@ -17,6 +17,7 @@ public class CommandUtils {
     final ArrayList<String> commands = new ArrayList<>();
 
     commands.add("ffmpeg");
+    commands.add("-y");
     commands.addAll(silentOperation());
     commands.add("-ss");
     commands.add(timestamp);
@@ -54,7 +55,7 @@ public class CommandUtils {
     final ArrayList<String> commands = new ArrayList<>();
     commands.add("-hide_banner");
     commands.add("-loglevel");
-    commands.add("panic");
+    commands.add("16");
 
     return commands;
   }

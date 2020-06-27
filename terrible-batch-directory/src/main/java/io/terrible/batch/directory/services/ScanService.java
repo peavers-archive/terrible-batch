@@ -2,9 +2,11 @@
 package io.terrible.batch.directory.services;
 
 import io.terrible.batch.data.domain.MediaFile;
-import java.util.ArrayDeque;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public interface ScanService {
 
-  ArrayDeque<MediaFile> scanVideos(String directory);
+  ArrayList<MediaFile> scanVideos(String directory);
 }

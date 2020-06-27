@@ -2,64 +2,81 @@
 package io.terrible.batch.directory.services;
 
 import com.google.common.net.MediaType;
-import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.domain.MediaFile;
-import io.terrible.batch.data.repository.DirectoryRepository;
 import io.terrible.batch.directory.converters.MediaFileConverter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScanServiceImpl implements ScanService {
 
-  private final DirectoryRepository directoryRepository;
-
   @Override
-  public ArrayDeque<MediaFile> scanVideos(final String input) {
-
-    final Directory directory = directoryRepository.findAll().get(0);
-    final ArrayDeque<MediaFile> results = new ArrayDeque<>();
-
-    if (StringUtils.isEmpty(input)) {
-      return results;
-    }
+  public ArrayList<MediaFile> scanVideos(final String input) {
 
     try {
-      Files.walk(Paths.get(input))
+      return Files.walk(Paths.get(input))
           .filter(Files::isReadable)
-          .forEach(path -> process(path, directory, results));
-    } catch (final IOException e) {
-      log.warn("Issue processing stream {} {}", e.getCause(), e);
+          .filter(this::isAcceptedSize)
+          .filter(this::isNotSample)
+          .filter(this::isNotDirectory)
+          .filter(this::isMediaFile)
+          .map(this::convert)
+          .collect(Collectors.toCollection(ArrayList::new));
+    } catch (final Exception e) {
+      return new ArrayList<>();
     }
-
-    return results;
   }
 
-  private void process(
-      final Path path, final Directory directory, final ArrayDeque<MediaFile> results) {
+  private boolean isMediaFile(final Path path) {
+    final String contentType = probeContentType(path);
 
+    //noinspection UnstableApiUsage
+    return StringUtils.isNotEmpty(contentType)
+        && MediaType.parse(contentType).is(MediaType.ANY_VIDEO_TYPE);
+  }
+
+  private boolean isNotDirectory(final Path path) {
+    return !Files.isDirectory(path);
+  }
+
+  private boolean isNotSample(final Path path) {
+    return !Pattern.compile(Pattern.quote("sample"), Pattern.CASE_INSENSITIVE)
+        .matcher(path.toString())
+        .find();
+  }
+
+  private boolean isAcceptedSize(final Path path) {
     try {
-      final String mimeType = Files.probeContentType(path);
-
-      //noinspection UnstableApiUsage
-      if (StringUtils.isNoneEmpty(mimeType)
-          && !path.toFile().getAbsolutePath().contains("sample")
-          && MediaType.parse(mimeType).is(MediaType.ANY_VIDEO_TYPE)) {
-
-        results.add(MediaFileConverter.convert(path.toFile(), directory));
-      }
-
+      return Files.size(path) > 104857600; // 100mb
     } catch (final IOException e) {
-      log.error("Unable to prob file {}", path);
+      log.error("Unable to calculate file size {} {}", path, e.getMessage());
+      return false;
     }
+  }
+
+  private String probeContentType(final Path path) {
+    try {
+      return Files.probeContentType(path);
+    } catch (final IOException e) {
+      log.error("Unable to probe {} {}", path, e.getMessage());
+      return null;
+    }
+  }
+
+  private MediaFile convert(final Path path) {
+    return MediaFileConverter.convert(path.toFile());
   }
 }

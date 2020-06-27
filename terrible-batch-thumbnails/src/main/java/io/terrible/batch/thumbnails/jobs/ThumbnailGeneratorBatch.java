@@ -2,6 +2,7 @@
 package io.terrible.batch.thumbnails.jobs;
 
 import io.terrible.batch.data.domain.MediaFile;
+import io.terrible.batch.thumbnails.listeners.JobLockExecutionListener;
 import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
 import lombok.RequiredArgsConstructor;
@@ -93,6 +94,7 @@ public class ThumbnailGeneratorBatch {
 
     return jobBuilderFactory
         .get("thumbnailGeneratorJob")
+        .listener(new JobLockExecutionListener())
         .incrementer(new RunIdIncrementer())
         .flow(partitionedStep(thumbnailGeneratorStep()))
         .end()
@@ -127,6 +129,6 @@ public class ThumbnailGeneratorBatch {
 
   @Bean(name = "io.terrible.batch.thumbnails.jobs.taskExecutor")
   public TaskExecutor taskExecutor() {
-    return new SimpleAsyncTaskExecutor("thumbnail_task");
+    return new SimpleAsyncTaskExecutor("thumbnail-job-");
   }
 }

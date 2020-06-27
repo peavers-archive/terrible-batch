@@ -43,8 +43,6 @@ public class SearchServiceImpl implements SearchService {
 
     final String indexSettings = getSettings();
 
-    log.info("Creating index with settings {}", indexSettings);
-
     if (StringUtils.isNotEmpty(indexSettings)) {
       final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
       createIndexRequest.source(indexSettings, XContentType.JSON);
