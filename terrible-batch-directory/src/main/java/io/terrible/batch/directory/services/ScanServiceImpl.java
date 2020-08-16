@@ -4,12 +4,6 @@ package io.terrible.batch.directory.services;
 import com.google.common.net.MediaType;
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.directory.converters.MediaFileConverter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +11,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

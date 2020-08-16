@@ -8,14 +8,14 @@ server:
 batch:
   directory:
     default: "${HOME}/.terrible/media/"
-    delay: 60000
+    delay: 300000
   cleaner:
-    delay: 60000
+    delay: 300000
   thumbnails:
     default: "${HOME}/.terrible/thumbnails/"
-    delay: 60000
+    delay: 300000
   search:
-    delay: 60000
+    delay: 300000
 
 search:
   scheme: "http"

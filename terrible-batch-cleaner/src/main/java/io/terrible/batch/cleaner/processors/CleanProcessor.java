@@ -3,17 +3,16 @@ package io.terrible.batch.cleaner.processors;
 
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.MediaFileRepository;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +23,9 @@ public class CleanProcessor implements ItemProcessor<MediaFile, MediaFile> {
   @Override
   public MediaFile process(@NonNull final MediaFile input) {
 
-    if (!Files.exists(Paths.get(input.getPath()), LinkOption.NOFOLLOW_LINKS)) {
+    final Path path = Paths.get(input.getPath());
+
+    if (Files.notExists(path)) {
       log.info("Cannot find {} - Removing record", input.getName());
 
       if (StringUtils.isNotBlank(input.getThumbnailPath())) {

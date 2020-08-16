@@ -2,12 +2,7 @@
 package io.terrible.batch.directory.converters;
 
 import com.google.common.hash.Hashing;
-import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.domain.MediaFile;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +13,9 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 
 /** Converts a file to a type of MediaFile */
 @Slf4j
