@@ -3,6 +3,8 @@ package io.terrible.batch.directory.schedulers;
 
 import io.terrible.batch.data.domain.Directory;
 import io.terrible.batch.data.repository.DirectoryRepository;
+import java.util.Date;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -17,9 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Component

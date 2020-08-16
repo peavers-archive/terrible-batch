@@ -2,9 +2,10 @@
 package io.terrible.batch.thumbnails.jobs;
 
 import io.terrible.batch.data.domain.MediaFile;
-import io.terrible.batch.thumbnails.listeners.JobLockExecutionListener;
 import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
 import io.terrible.batch.thumbnails.services.ThumbnailService;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -22,14 +23,9 @@ import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Configuration
@@ -94,7 +90,6 @@ public class ThumbnailGeneratorBatch {
 
     return jobBuilderFactory
         .get("thumbnailGeneratorJob")
-        .listener(new JobLockExecutionListener())
         .incrementer(new RunIdIncrementer())
         .flow(partitionedStep(thumbnailGeneratorStep()))
         .end()
@@ -110,7 +105,6 @@ public class ThumbnailGeneratorBatch {
         .reader(reader())
         .processor(processor())
         .writer(writer())
-        .taskExecutor(taskExecutor())
         .build();
   }
 
@@ -125,10 +119,5 @@ public class ThumbnailGeneratorBatch {
         .partitioner("thumbnailGeneratorStep", new SimplePartitioner())
         .gridSize(WORKER_THREAD_COUNT)
         .build();
-  }
-
-  @Bean(name = "io.terrible.batch.thumbnails.jobs.taskExecutor")
-  public TaskExecutor taskExecutor() {
-    return new SimpleAsyncTaskExecutor("thumbnail-job-");
   }
 }
