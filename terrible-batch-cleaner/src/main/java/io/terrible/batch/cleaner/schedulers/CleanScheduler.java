@@ -34,10 +34,6 @@ public class CleanScheduler {
   }
 
   private Consumer<MediaFile> consume() {
-    return mediaFile ->
-        executor.submit(
-            () -> {
-              processor.process(mediaFile);
-            });
+    return mediaFile -> executor.submit(() -> processor.process(mediaFile));
   }
 }
