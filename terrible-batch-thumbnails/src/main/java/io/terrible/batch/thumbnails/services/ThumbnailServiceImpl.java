@@ -57,6 +57,8 @@ public class ThumbnailServiceImpl implements ThumbnailService {
       thumbnails.add(thumbnailLocation.toString());
     }
 
+    log.info("Created thumbnails: {}", input);
+
     return thumbnails;
   }
 

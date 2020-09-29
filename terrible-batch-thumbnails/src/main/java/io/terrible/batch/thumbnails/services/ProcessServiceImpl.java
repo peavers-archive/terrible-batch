@@ -24,10 +24,14 @@ public class ProcessServiceImpl implements ProcessService {
 
     final ProcessBuilder processBuilder = new ProcessBuilder(command);
     final Process process = processBuilder.start();
+
+    if (!process.waitFor(1, TimeUnit.MINUTES)) {
+      log.warn("Timing out process for {}", command);
+      process.destroy();
+    }
+
     final String output = readConsole(process.getInputStream());
     final String error = readConsole(process.getErrorStream());
-
-    process.waitFor(5, TimeUnit.MINUTES);
 
     logResult(output, error);
 

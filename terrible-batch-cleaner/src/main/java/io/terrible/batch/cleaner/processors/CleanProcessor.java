@@ -11,28 +11,34 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class CleanProcessor implements ItemProcessor<MediaFile, MediaFile> {
+public class CleanProcessor {
 
   private final MediaFileRepository mediaFileRepository;
 
-  @Override
-  public MediaFile process(@NonNull final MediaFile input) {
+  public MediaFile process(@NonNull final MediaFile mediaFile) {
 
-    final Path path = Paths.get(input.getPath());
+    final Path path = Paths.get(mediaFile.getPath());
 
-    if (Files.notExists(path)) {
-      log.info("Cannot find {} - Removing record", input.getName());
+    if (mediaFile.isDelete()) {
+      log.info("{} - Flagged for deletion", mediaFile.getName());
 
-      if (StringUtils.isNotBlank(input.getThumbnailPath())) {
-        FileUtils.deleteQuietly(new File(input.getThumbnailPath()));
+      FileUtils.deleteQuietly(new File(mediaFile.getThumbnailPath()));
+      FileUtils.deleteQuietly(new File(mediaFile.getPath()));
+      mediaFileRepository.delete(mediaFile);
+    } else if (Files.notExists(path)) {
+      log.info("Cannot find {} - Removing record", mediaFile.getName());
+
+      if (StringUtils.isNotBlank(mediaFile.getThumbnailPath())) {
+        FileUtils.deleteQuietly(new File(mediaFile.getThumbnailPath()));
       }
 
-      mediaFileRepository.delete(input);
+      mediaFileRepository.delete(mediaFile);
     }
 
     return null;

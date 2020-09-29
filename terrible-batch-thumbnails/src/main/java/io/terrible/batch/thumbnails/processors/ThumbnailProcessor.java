@@ -11,14 +11,13 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
+public class ThumbnailProcessor {
 
   private static final int NUMBER_OF_THUMBNAILS = 12;
 
@@ -27,7 +26,6 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
   @Value("${batch.thumbnails.default}")
   private String baseDir;
 
-  @Override
   public MediaFile process(final MediaFile mediaFile) {
     ArrayDeque<String> thumbnails = new ArrayDeque<>(NUMBER_OF_THUMBNAILS);
 
@@ -38,10 +36,11 @@ public class ThumbnailProcessor implements ItemProcessor<MediaFile, MediaFile> {
 
     try {
       thumbnails = thumbnailService.createThumbnails(input, output, NUMBER_OF_THUMBNAILS);
-    } catch (final UnableToCalculateDurationException
-        | UnableToReadFileException
-        | Exception exception) {
+    } catch (Exception | UnableToCalculateDurationException | UnableToReadFileException exception) {
       mediaFile.setIgnored(true);
+      log.info(
+          "Marking {} as ignored due to error {}", mediaFile.getName(), exception.getMessage());
+      log.error("Error {} {}", exception, exception.getMessage());
     }
 
     mediaFile.setThumbnails(thumbnails);

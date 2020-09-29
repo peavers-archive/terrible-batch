@@ -5,30 +5,30 @@ import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.MediaFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class DirectoryProcessor implements ItemProcessor<MediaFile, MediaFile> {
+public class DirectoryProcessor {
 
   private final MediaFileRepository mediaFileRepository;
 
-  @Override
   public MediaFile process(@NonNull final MediaFile input) {
-    final MediaFile lookup =
+    final MediaFile mediaFile =
         mediaFileRepository.findById(input.getId()).orElse(MediaFile.builder().build());
 
-    lookup.setId(input.getId());
-    lookup.setName(input.getName());
-    lookup.setPath(input.getPath());
-    lookup.setExtension(input.getExtension());
-    lookup.setSize(input.getSize());
-    lookup.setCreatedTime(input.getCreatedTime());
-    lookup.setLastAccessTime(input.getLastAccessTime());
-    lookup.setLastModifiedTime(input.getLastModifiedTime());
-    lookup.setLastWatched(input.getLastWatched());
+    mediaFile.setId(input.getId());
+    mediaFile.setName(input.getName());
+    mediaFile.setPath(input.getPath());
+    mediaFile.setExtension(input.getExtension());
+    mediaFile.setSize(input.getSize());
+    mediaFile.setCreatedTime(input.getCreatedTime());
+    mediaFile.setLastAccessTime(input.getLastAccessTime());
+    mediaFile.setLastModifiedTime(input.getLastModifiedTime());
+    mediaFile.setLastWatched(input.getLastWatched());
 
-    return lookup;
+    return mediaFileRepository.save(mediaFile);
   }
 }

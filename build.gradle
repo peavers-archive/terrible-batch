@@ -28,9 +28,8 @@ allprojects {
     }
 
     dependencies {
-        // Spring Batch
-        implementation 'org.springframework.boot:spring-boot-starter-batch'
-        implementation 'org.hsqldb:hsqldb'
+        // Spring
+        implementation 'org.springframework.boot:spring-boot-starter'
 
         // Apache
         implementation 'org.apache.commons:commons-lang3:3.10'

@@ -3,7 +3,13 @@ package io.terrible.batch.cleaner.schedulers;
 
 import io.terrible.batch.cleaner.processors.CleanProcessor;
 import io.terrible.batch.data.domain.MediaFile;
+import io.terrible.batch.data.domain.MediaList;
 import io.terrible.batch.data.repository.MediaFileRepository;
+import io.terrible.batch.data.repository.MediaListRepository;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -17,27 +23,35 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
-public class CleanScheduler {
-
-  private final ExecutorService executor;
+public class CleanSchedulerLists {
 
   private final MediaFileRepository mediaFileRepository;
 
-  private final CleanProcessor processor;
+  private final MediaListRepository mediaListRepository;
 
   @Async
   @Scheduled(fixedDelay = 900000)
   public void schedule() {
-    log.info("CleanScheduler started");
-    mediaFileRepository.findAll().forEach(consume());
-    log.info("CleanScheduler finished");
+    log.info("CleanSchedulerLists started");
+
+    mediaListRepository.findAll().forEach(mediaList -> {
+      Iterator<MediaFile> iterator = mediaList.getMediaFiles().iterator();
+
+      while(iterator.hasNext()) {
+        MediaFile mediaFile = iterator.next();
+
+        Optional<MediaFile> optionalMediaFile = mediaFileRepository.findById(mediaFile.getId());
+
+        if(!optionalMediaFile.isPresent()) {
+          iterator.remove();
+        }
+      }
+
+      mediaListRepository.save(mediaList);
+    });
+
+    log.info("CleanSchedulerLists finished");
   }
 
-  private Consumer<MediaFile> consume() {
-    return mediaFile ->
-        executor.submit(
-            () -> {
-              processor.process(mediaFile);
-            });
-  }
+
 }

@@ -5,18 +5,18 @@ import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.search.services.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class SearchProcessor implements ItemProcessor<MediaFile, MediaFile> {
+public class SearchProcessor {
 
   private static final String INDEX = "media-files";
 
   private final SearchService searchService;
 
-  @Override
   public MediaFile process(@NonNull final MediaFile mediaFile) {
 
     searchService.addToIndex(INDEX, mediaFile);

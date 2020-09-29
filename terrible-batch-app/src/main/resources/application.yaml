@@ -1,6 +1,9 @@
 spring:
   application:
     name: terrible-batch-service
+  data:
+    mongodb:
+      host: 192.168.0.10
 
 server:
   shutdown: graceful
@@ -8,18 +11,18 @@ server:
 batch:
   directory:
     default: "${HOME}/.terrible/media/"
-    delay: 300000
+    delay: 900000
   cleaner:
-    delay: 300000
+    delay: 900000
   thumbnails:
     default: "${HOME}/.terrible/thumbnails/"
-    delay: 300000
+    delay: 900000
   search:
-    delay: 300000
+    delay: 900000
 
 search:
   scheme: "http"
-  host: "localhost"
+  host: "192.168.0.10"
   port: 9200
 
 ---

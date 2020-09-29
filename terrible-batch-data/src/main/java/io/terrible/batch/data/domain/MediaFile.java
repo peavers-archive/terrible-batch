@@ -44,4 +44,6 @@ public class MediaFile {
   private boolean isIndexed;
 
   private boolean isIgnored;
+
+  private boolean isDelete;
 }

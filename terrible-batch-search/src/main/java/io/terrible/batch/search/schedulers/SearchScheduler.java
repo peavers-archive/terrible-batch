@@ -1,16 +1,15 @@
 /* Licensed under Apache-2.0 */
 package io.terrible.batch.search.schedulers;
 
-import java.util.Date;
+import io.terrible.batch.data.domain.MediaFile;
+import io.terrible.batch.data.repository.MediaFileRepository;
+import io.terrible.batch.search.processors.SearchProcessor;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,25 +17,28 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
+@RequiredArgsConstructor
 public class SearchScheduler {
 
-  private final SimpleJobLauncher launcher;
+  private final ExecutorService executor;
 
-  private final Job job;
+  private final MediaFileRepository mediaFileRepository;
 
-  public SearchScheduler(
-      final SimpleJobLauncher launcher,
-      @Qualifier("io.terrible.batch.search.jobs.searchJob") final Job job) {
+  private final SearchProcessor processor;
 
-    this.launcher = launcher;
-    this.job = job;
+  @Async
+  @Scheduled(fixedDelay = 900000)
+  public void execute() {
+    log.info("SearchScheduler started");
+    mediaFileRepository.findAll().stream()
+        .filter(mediaFile -> !mediaFile.isIndexed())
+        .forEach(consume());
+    log.info("SearchScheduler finished");
   }
 
-  @Scheduled(fixedDelayString = "${batch.search.delay}")
-  public void schedule()
-      throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
-          JobRestartException, JobInstanceAlreadyCompleteException {
-
-    launcher.run(job, new JobParametersBuilder().addDate("date", new Date()).toJobParameters());
+  private Consumer<MediaFile> consume() {
+    return mediaFile ->
+        executor.submit(
+            () -> mediaFileRepository.save(Objects.requireNonNull(processor.process(mediaFile))));
   }
 }

@@ -3,7 +3,7 @@ package io.terrible.batch.thumbnails.schedulers;
 
 import io.terrible.batch.data.domain.MediaFile;
 import io.terrible.batch.data.repository.MediaFileRepository;
-import io.terrible.batch.thumbnails.processors.ThumbnailProcessor;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -17,30 +17,31 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
-public class ThumbnailGeneratorScheduler {
+public class ThumbnailCleanScheduler {
 
   private final ExecutorService executor;
 
   private final MediaFileRepository mediaFileRepository;
 
-  private final ThumbnailProcessor processor;
-
   @Async
-  @Scheduled(fixedDelay = 900000)
+  @Scheduled(fixedDelay = 86400000)
   public void execute() {
 
-    log.info("ThumbnailGeneratorScheduler started");
+    log.info("ThumbnailCleanScheduler started");
 
     mediaFileRepository.findAllByOrderByCreatedTimeDesc().stream()
         .filter(mediaFile -> !mediaFile.isIgnored())
-        .filter(mediaFile -> mediaFile.getThumbnails().size() < 12)
         .forEach(consume());
 
-    log.info("ThumbnailGeneratorScheduler finished");
+    log.info("ThumbnailCleanScheduler finished");
   }
 
   private Consumer<MediaFile> consume() {
     return mediaFile ->
-        executor.submit(() -> mediaFileRepository.save(processor.process(mediaFile)));
+        executor.submit(
+            () -> {
+              mediaFile.getThumbnails().removeIf(path -> !new File(path).isFile());
+              mediaFileRepository.save(mediaFile);
+            });
   }
 }
